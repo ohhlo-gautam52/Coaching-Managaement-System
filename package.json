@@ -1,0 +1,17 @@
+{
+  "name": "cms-company-level",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^9.3.3",
+    "multer": "1.4.5-lts.1",
+    "pdfkit": "^0.18.0",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.3"
+  }
+}

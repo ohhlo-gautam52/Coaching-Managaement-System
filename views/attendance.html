@@ -1,0 +1,127 @@
+<html>
+
+<head>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<h2>Attendance</h2>
+
+<input id="student" placeholder="Student">
+<input id="date" placeholder="Date">
+<input id="status" placeholder="Status">
+
+<button onclick="add()">Add</button>
+
+<br><br>
+
+<table border="1" width="100%" id="table">
+
+<thead>
+<tr>
+<th>Student</th>
+<th>Date</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+/* Load attendance records */
+
+async function load(){
+
+const r = await fetch("/api/attendance");
+const d = await r.json();
+
+const tbody = document.getElementById("tbody");
+
+tbody.innerHTML = "";
+
+d.forEach(x => {
+
+tbody.innerHTML += `
+<tr>
+<td>${x.student}</td>
+<td>${x.date}</td>
+<td>${x.status}</td>
+
+<td>
+<button onclick="deleteAttendance(${x.id})">Delete</button>
+</td>
+
+</tr>
+`;
+
+});
+
+}
+
+/* add attendance */
+
+async function add(){
+
+const student = document.getElementById("student").value;
+const date = document.getElementById("date").value;
+const status = document.getElementById("status").value;
+
+if(!student || !date || !status){
+alert("Please fill all fields");
+return;
+}
+
+const obj = {
+student: student,
+date: date,
+status: status
+};
+
+await fetch("/api/attendance",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(obj)
+});
+
+/* clear fields */
+
+document.getElementById("student").value="";
+document.getElementById("date").value="";
+document.getElementById("status").value="";
+
+load();
+
+}
+
+/* Delete attendance */
+
+async function deleteAttendance(id){
+
+if(confirm("Delete this record?")){
+
+await fetch("/api/attendance/" + id,{
+method:"DELETE"
+});
+
+load();
+
+}
+
+}
+
+/* Load data */
+
+load();
+
+</script>
+
+</body>
+
+</html>

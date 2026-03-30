@@ -1,0 +1,125 @@
+<html>
+
+<head>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<h2>Upload Study Material</h2>
+
+<input id="title" placeholder="Title">
+<input id="subject" placeholder="Subject">
+<input type="file" id="file">
+
+<button onclick="upload()">Upload</button>
+
+<br><br>
+
+<table border="1" width="100%" id="table">
+
+<thead>
+<tr>
+<th>Title</th>
+<th>Subject</th>
+<th>File</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+/* Load materials */
+
+async function load(){
+
+const res = await fetch("/api/materials");
+const data = await res.json();
+
+const tbody = document.getElementById("tbody");
+
+tbody.innerHTML = "";
+
+data.forEach(m => {
+
+tbody.innerHTML += `
+<tr>
+<td>${m.title}</td>
+<td>${m.subject}</td>
+
+<td>
+<a href="/uploads/${m.file}" target="_blank">View File</a>
+</td>
+
+<td>
+<button onclick="deleteMaterial(${m.id})">Delete</button>
+</td>
+
+</tr>
+`;
+
+});
+
+}
+
+/* Upload material */
+
+async function upload(){
+
+const title = document.getElementById("title").value;
+const subject = document.getElementById("subject").value;
+const file = document.getElementById("file").files[0];
+
+if(!title || !subject || !file){
+alert("Please fill all fields");
+return;
+}
+
+const fd = new FormData();
+
+fd.append("title", title);
+fd.append("subject", subject);
+fd.append("file", file);
+
+await fetch("/api/materials",{
+method:"POST",
+body:fd
+});
+
+document.getElementById("title").value="";
+document.getElementById("subject").value="";
+document.getElementById("file").value="";
+
+load();
+
+}
+
+/* Delete material */
+
+async function deleteMaterial(id){
+
+if(confirm("Delete this record?")){
+
+await fetch("/api/materials/" + id,{
+method:"DELETE"
+});
+
+load();
+
+}
+
+}
+
+/* Load materials when page starts */
+
+load();
+
+</script>
+
+</body>
+
+</html>

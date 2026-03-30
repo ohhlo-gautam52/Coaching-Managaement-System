@@ -1,0 +1,135 @@
+<html>
+<head>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<style>
+
+
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+
+font-family:"Segoe UI",sans-serif;
+
+
+background:linear-gradient(-45deg,#03045E,#0077B6,#0096C7,#48CAE4);
+background-size:400% 400%;
+animation:gradientMove 10s ease infinite;
+}
+
+/* ANIMATION */
+@keyframes gradientMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* LOGIN BOX */
+.loginBox{
+width:320px;
+padding:30px;
+
+border-radius:20px;
+
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(15px);
+
+box-shadow:0 10px 40px rgba(0,0,0,0.3);
+
+text-align:center;
+color:white;
+}
+
+/* TITLE */
+.loginBox h2{
+margin-bottom:20px;
+}
+
+/* INPUT */
+.loginBox input{
+width:100%;
+padding:10px;
+margin:10px 0;
+
+border:none;
+border-radius:10px;
+
+background:rgba(255,255,255,0.2);
+color:white;
+outline:none;
+}
+
+/* PLACEHOLDER */
+.loginBox input::placeholder{
+color:#ddd;
+}
+
+/* BUTTON */
+.loginBox button{
+width:100%;
+padding:10px;
+
+border:none;
+border-radius:12px;
+
+background:linear-gradient(135deg,#00B4D8,#0077B6);
+color:white;
+font-weight:bold;
+
+cursor:pointer;
+transition:0.3s;
+}
+
+/* HOVER */
+.loginBox button:hover{
+transform:scale(1.05);
+background:linear-gradient(135deg,#48CAE4,#00B4D8);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="loginBox">
+
+<h2>🔐 CMS Login</h2>
+
+<input id="u" placeholder="Username">
+<input id="p" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+</div>
+
+<script>
+
+async function login(){
+
+const r = await fetch("/api/login",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+username:u.value,
+password:p.value
+})
+});
+
+if(r.status!=200){
+alert("Invalid Login ❌");
+return;
+}
+
+location="dashboard.html";
+
+}
+
+</script>
+
+</body>
+</html>

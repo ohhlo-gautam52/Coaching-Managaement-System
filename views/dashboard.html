@@ -1,0 +1,569 @@
+<html>
+
+<head>
+
+<title>Dashboard</title>
+
+<link rel="stylesheet" href="/css/style.css"> 
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</head>
+
+<body>
+
+<h2>Coaching Management Dashboard</h2>
+
+<div class="navbar">
+
+<a href="students.html">Students</a>
+<a href="teachers.html">Teachers</a>
+<a href="attendance.html">Attendance</a>
+<a href="marks.html">Marks</a>
+<a href="fees.html">Fees</a>
+<a href="timetable.html">Timetable</a>
+<a href="materials.html">Materials</a>
+<a href="chat.html">Chat</a>
+
+<a href="exams.html">Exams</a>
+<a href="onlineExam.html">Online Exam</a>
+<a href="homework.html">Homework</a>
+<a href="employees.html">HR</a>
+<a href="leave.html">Leave</a>
+<a href="library.html">Library</a>
+<a href="transport.html">Transport</a>
+<a href="hostel.html">Hostel</a>
+
+</div>
+
+<!--kpi card -->
+<div class="kpi">
+
+<div class="kpiCard">
+<h4>Total Students</h4>
+<p id="totalStudents">0</p>
+</div>
+
+<div class="kpiCard">
+<h4>Total Fees</h4>
+<p id="totalFees">0</p>
+</div>
+
+<div class="kpiCard">
+<h4>Teachers</h4>
+<p id="totalTeachers">0</p>
+</div>
+
+<div class="kpiCard">
+<h4>Attendance</h4>
+<p id="totalAttendance">0</p>
+</div>
+
+</div>
+ <!--kpi card -->
+<div class="dashboard">
+
+<div class="card chartCard">
+<h3>Student Marks Distribution</h3>
+<div class="chartContainer">
+<canvas id="marksChart"></canvas>
+</div>
+</div>
+
+<div class="card">
+<h3>Total Fees Collection</h3>
+<div class="chartContainer">
+<canvas id="feesChart"></canvas>
+</div>
+</div>
+
+<div class="card">
+
+<h3>Admin Workflows</h3>
+
+<div class="workflow">
+
+<div class="workflowItem" onclick="openModule('admission')">Admission</div>
+<div class="workflowItem" onclick="openModule('visitors')">Visitor Log</div>
+<div class="workflowItem" onclick="openModule('calls')">Calls</div>
+<div class="workflowItem" onclick="openModule('incomingMail')">Incoming Mail</div>
+<div class="workflowItem" onclick="openModule('outgoingMail')">Outgoing Mail</div>
+<div class="workflowItem" onclick="openModule('complaints')">Complaints</div>
+<div class="workflowItem" onclick="openModule('certificates')">Certificates</div>
+<div class="workflowItem" onclick="openModule('idcards')">ID Cards</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="modulePanel"></div>
+
+<script>
+
+    /*theme*/
+function toggleDark(){
+
+document.body.classList.toggle("dark");
+
+const btn=document.querySelector(".toggleBtn");
+
+if(document.body.classList.contains("dark")){
+btn.innerHTML="☀️ Light Mode";
+}else{
+btn.innerHTML="🌙 Dark Mode";
+}
+
+}
+    /* auto update */
+async function loadKPI(){
+
+const students = await (await fetch("/api/students")).json();
+const teachers = await (await fetch("/api/teachers")).json();
+const attendance = await (await fetch("/api/attendance")).json();
+const fees = await (await fetch("/api/fees")).json();
+
+/* COUNT */
+
+document.getElementById("totalStudents").innerText = students.length;
+document.getElementById("totalTeachers").innerText = teachers.length;
+document.getElementById("totalAttendance").innerText = attendance.length;
+
+/* FEES */
+
+let total=0;
+fees.forEach(f=> total += Number(f.amount));
+
+document.getElementById("totalFees").innerText = "₹ " + total.toLocaleString();
+
+}
+
+loadKPI();
+
+/* AUTO REFRESH */
+
+setInterval(loadKPI,5000);
+/* kpi card*/
+async function loadKPI(){
+
+const students = await (await fetch("/api/students")).json();
+const teachers = await (await fetch("/api/teachers")).json();
+const attendance = await (await fetch("/api/attendance")).json();
+const fees = await (await fetch("/api/fees")).json();
+
+/* COUNT */
+
+document.getElementById("totalStudents").innerText = students.length;
+document.getElementById("totalTeachers").innerText = teachers.length;
+document.getElementById("totalAttendance").innerText = attendance.length;
+
+/* FEES */
+
+let total=0;
+fees.forEach(f=> total += Number(f.amount));
+
+document.getElementById("totalFees").innerText = "₹ " + total.toLocaleString();
+
+}
+
+loadKPI();
+
+/* AUTO REFRESH */
+
+setInterval(loadKPI,5000);
+
+/* CHART FIX */
+
+let marksChart, feesChart;
+
+async function loadDashboard(){
+
+const marks = await (await fetch("/api/marks")).json();
+
+let a=0,b=0,c=0;
+
+marks.forEach(m=>{
+const s=Number(m.score);
+if(s>=80)a++;
+else if(s>=50)b++;
+else c++;
+});
+
+if(marksChart) marksChart.destroy();
+
+/*  GRADIENT COLORS */
+
+const ctx = document.getElementById("marksChart").getContext("2d");
+
+const greenGrad = ctx.createLinearGradient(0,0,0,300);
+greenGrad.addColorStop(0,"#22c55e");
+greenGrad.addColorStop(1,"#16a34a");
+
+const yellowGrad = ctx.createLinearGradient(0,0,0,300);
+yellowGrad.addColorStop(0,"#facc15");
+yellowGrad.addColorStop(1,"#eab308");
+
+const redGrad = ctx.createLinearGradient(0,0,0,300);
+redGrad.addColorStop(0,"#f87171");
+redGrad.addColorStop(1,"#dc2626");
+
+/* UPDATED CHART */
+
+marksChart = new Chart(ctx,{
+type:"pie",
+data:{
+labels:["Above 80","50-79","Below 50"],
+datasets:[{
+data:[a,b,c],
+backgroundColor:[greenGrad,yellowGrad,redGrad],
+borderColor:"#ffffff",
+borderWidth:2,
+hoverOffset:10
+}]
+},
+
+options:{
+responsive:true,
+maintainAspectRatio:false,
+
+plugins:{
+legend:{
+position:"top",
+labels:{
+color:"#ffffff",   
+font:{
+size:13,
+weight:"bold"
+}
+}
+}
+}
+}
+});
+
+
+/* FEES */
+
+const fees = await (await fetch("/api/fees")).json();
+
+let total=0;
+fees.forEach(f=> total+=Number(f.amount));
+
+if(feesChart) feesChart.destroy();
+
+feesChart=new Chart(document.getElementById("feesChart"),{
+type:"bar",
+data:{
+labels:["Total Fees"],
+datasets:[{
+label:"Fees Collected",
+data:[total],
+backgroundColor:[
+"#2563eb"],
+borderRadius:[8
+],
+borderRadius:10,
+barThickness:60
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+
+plugins:{
+legend:{
+labels:{
+color:"#000"  
+}
+}
+},
+
+scales:{
+y:{
+ticks:{color:"#000"},
+grid:{color:"#ddd"}
+},
+x:{
+ticks:{color:"#000"}
+}
+}
+}
+});
+}
+loadDashboard();
+
+/* MODULE */
+
+function openModule(api){
+
+const panel=document.getElementById("modulePanel");
+panel.style.display="block";
+
+let html="";
+
+/* FORMS */
+
+if(api==="admission"){
+html=`<h3>Admission</h3>
+<input id="name" placeholder="Student Name">
+<input id="course" placeholder="Course">
+<button onclick="save('${api}')">Save</button>
+<table id="table"></table>`;
+}
+
+else if(api==="visitors"){
+html=`<h3>Visitor</h3>
+<input id="name" placeholder="Visitor Name">
+<input id="purpose" placeholder="Purpose">
+<button onclick="save('${api}')">Save</button>
+<table id="table"></table>`;
+}
+
+else if(api==="calls"){
+html=`<h3>Calls</h3>
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
+<button onclick="save('${api}')">Save</button>
+<table id="table"></table>`;
+}
+else if(api==="incomingMail"){
+html=`<h3>Incoming Mail</h3>
+<input id="sender" placeholder="Sender Name">
+<input id="reference" placeholder="Reference No">
+<button onclick="save('${api}')">Save</button>
+<table id="table"></table>`;
+}
+
+else if(api==="outgoingMail"){
+html=`<h3>Outgoing Mail</h3>
+<input id="receiver" placeholder="Receiver Name">
+<input id="tracking" placeholder="Tracking No">
+<button onclick="save('${api}')">Save</button>
+<table id="table"></table>`;
+}
+
+else if(api==="complaints"){
+html=`<h3>Complaints</h3>
+<input id="name" placeholder="Student Name">
+<input id="complaint" placeholder="Complaint">
+<button onclick="save('${api}')">Save</button>
+<table id="table"></table>`;
+}
+/* CERTIFICATE */
+
+else if(api==="certificates"){
+html=`<h3>Certificate</h3>
+<input id="name" placeholder="Student Name">
+<input id="course" placeholder="Course">
+<button onclick="generateCertificate()">Generate</button>
+<div id="cert"></div>`;
+}
+
+/* ID CARD */
+
+else if(api==="idcards"){
+html=`<h3>ID Card</h3>
+<input id="name" placeholder="Student Name">
+<input id="class" placeholder="Class">
+<button onclick="generateID()">Generate</button>
+<div id="id"></div>`;
+}
+
+panel.innerHTML=html;
+
+if(api!=="certificates" && api!=="idcards"){
+load(api);
+}
+
+}
+
+
+/* SAVE */
+
+
+
+async function save(api){
+
+let body={};
+
+ 
+
+if(api==="admission"){
+body={
+name:document.getElementById("name").value,
+course:document.getElementById("course").value
+};
+}
+
+if(api==="visitors"){
+body={
+name:document.getElementById("name").value,
+purpose:document.getElementById("purpose").value
+};
+}
+
+if(api==="calls"){
+body={
+name:document.getElementById("name").value,
+phone:document.getElementById("phone").value
+};
+}
+
+
+
+if(api==="incomingMail"){
+body={
+name:document.getElementById("sender").value,
+details:document.getElementById("reference").value
+};
+}
+
+if(api==="outgoingMail"){
+body={
+name:document.getElementById("receiver").value,
+details:document.getElementById("tracking").value
+};
+}
+
+if(api==="complaints"){
+body={
+name:document.getElementById("name").value,
+details:document.getElementById("complaint").value
+};
+}
+
+await fetch("/api/"+api,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(body)
+});
+
+load(api);
+
+}
+
+/* LOAD */
+
+
+
+async function load(api){
+
+const data = await (await fetch("/api/"+api)).json();
+
+const table=document.getElementById("table");
+
+table.innerHTML="<tr><th>Name</th><th>Details</th><th>Delete</th></tr>";
+
+data.forEach(x=>{
+
+
+
+let nameVal =
+x.name ||
+x.student ||
+x.user ||
+x.sender ||
+x.receiver ||
+x.field1 ||
+"—";
+
+let detailVal =
+x.course ||
+x.purpose ||
+x.phone ||
+x.details ||
+x.field2 ||
+"—";
+
+table.innerHTML+=`
+<tr>
+<td>${nameVal}</td>
+<td>${detailVal}</td>
+<td><button onclick="del('${api}',${x.id})">Delete</button></td>
+</tr>`;
+});
+
+}
+
+
+/* DELETE */
+
+async function del(api,id){
+await fetch("/api/"+api+"/"+id,{method:"DELETE"});
+load(api);
+}
+
+/* CERTIFICATE DESIGN  */
+
+function generateCertificate(){
+
+const student=document.getElementById("name").value;
+const course=document.getElementById("course").value;
+
+document.getElementById("cert").innerHTML=`
+<div style="
+padding:20px;
+margin-top:15px;
+border-radius:12px;
+background:linear-gradient(135deg,#667eea,#764ba2);
+color:white;
+text-align:center;
+">
+
+<h2>🏆 Certificate of Completion</h2>
+
+<p>This is to certify that</p>
+
+<h3>${student}</h3>
+
+<p>has successfully completed</p>
+
+<h3>${course}</h3>
+
+<p>🎉 Congratulations 🎉</p>
+
+</div>`;
+}
+
+/* ID CARD DESIGN  */
+
+function generateID(){
+
+const student=document.getElementById("name").value;
+const cls=document.getElementById("class").value;  
+
+document.getElementById("id").innerHTML=`
+<div style="
+width:230px;
+padding:15px;
+border-radius:12px;
+background:linear-gradient(135deg,#667eea,#764ba2);
+color:white;
+text-align:center;
+margin-top:15px;
+box-shadow:0 6px 15px rgba(0,0,0,0.2);
+">
+
+<h3>🎓 ID CARD</h3>
+
+<p style="font-size:16px;"><b>${student}</b></p>
+
+<p>Class: ${cls}</p>
+
+<hr>
+
+<p style="font-size:12px;">Institute ID</p>
+
+</div>`;
+}
+
+
+
+
+</script>
+
+</body>
+</html>

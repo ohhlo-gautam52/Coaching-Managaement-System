@@ -1,0 +1,127 @@
+<html>
+
+<head>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<h2>Marks</h2>
+
+<input id="student" placeholder="Student">
+<input id="subject" placeholder="Subject">
+<input id="score" placeholder="Score">
+
+<button onclick="add()">Add</button>
+
+<br><br>
+
+<table border="1" width="100%" id="table">
+
+<thead>
+<tr>
+<th>Student</th>
+<th>Subject</th>
+<th>Score</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+/* Load marks */
+
+async function load(){
+
+const r = await fetch("/api/marks");
+const d = await r.json();
+
+const tbody = document.getElementById("tbody");
+
+tbody.innerHTML = "";
+
+d.forEach(x => {
+
+tbody.innerHTML += `
+<tr>
+<td>${x.student}</td>
+<td>${x.subject}</td>
+<td>${x.score}</td>
+
+<td>
+<button onclick="deleteMark(${x.id})">Delete</button>
+</td>
+
+</tr>
+`;
+
+});
+
+}
+
+/* Add marks */
+
+async function add(){
+
+const student = document.getElementById("student").value;
+const subject = document.getElementById("subject").value;
+const score = document.getElementById("score").value;
+
+if(!student || !subject || !score){
+alert("Please fill all fields");
+return;
+}
+
+const obj = {
+student: student,
+subject: subject,
+score: score
+};
+
+await fetch("/api/marks",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(obj)
+});
+
+/* clear inputs */
+
+document.getElementById("student").value="";
+document.getElementById("subject").value="";
+document.getElementById("score").value="";
+
+load();
+
+}
+
+/* Delete marks */
+
+async function deleteMark(id){
+
+if(confirm("Delete this record?")){
+
+await fetch("/api/marks/" + id,{
+method:"DELETE"
+});
+
+load();
+
+}
+
+}
+
+/* Load data when page starts */
+
+load();
+
+</script>
+
+</body>
+
+</html>

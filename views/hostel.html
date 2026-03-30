@@ -1,0 +1,66 @@
+<html>
+<head>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<h2>Hostel Management</h2>
+
+<input id="room" placeholder="Room Number">
+<input id="student" placeholder="Student Name">
+<button onclick="add()">Assign Room</button>
+
+<table id="t">
+<tr>
+<th>Room</th>
+<th>Student</th>
+<th>Delete</th>
+</tr>
+</table>
+
+<script>
+
+async function load(){
+
+const r = await fetch("/api/hostelRooms");
+const d = await r.json();
+
+d.forEach(x=>{
+t.innerHTML += `
+<tr>
+<td>${x.room}</td>
+<td>${x.student}</td>
+<td><button onclick="del(${x.id})">Delete</button></td>
+</tr>`;
+});
+
+}
+
+async function add(){
+
+await fetch("/api/hostelRooms",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+room:room.value,
+student:student.value
+})
+});
+
+location.reload();
+}
+
+async function del(id){
+
+await fetch("/api/hostelRooms/"+id,{method:"DELETE"});
+
+location.reload();
+}
+
+load();
+
+</script>
+
+</body>
+</html>

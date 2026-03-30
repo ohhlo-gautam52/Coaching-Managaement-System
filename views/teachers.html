@@ -1,0 +1,121 @@
+<html>
+
+<head>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<h2>Teachers</h2>
+
+<input id="name" placeholder="Name">
+<input id="subject" placeholder="Subject">
+
+<button onclick="add()">Add</button>
+
+<br><br>
+
+<table border="1" width="100%" id="t">
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Subject</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+/* Load teachers */
+
+async function load(){
+
+const r = await fetch("/api/teachers");
+const d = await r.json();
+
+const tbody = document.getElementById("tbody");
+
+tbody.innerHTML = "";
+
+d.forEach(x => {
+
+tbody.innerHTML += `
+<tr>
+<td>${x.name}</td>
+<td>${x.subject}</td>
+
+<td>
+<button onclick="deleteTeacher(${x.id})">Delete</button>
+</td>
+
+</tr>
+`;
+
+});
+
+}
+
+/* Add teacher */
+
+async function add(){
+
+const name = document.getElementById("name").value;
+const subject = document.getElementById("subject").value;
+
+if(!name || !subject){
+alert("Please fill all fields");
+return;
+}
+
+const obj = {
+name: name,
+subject: subject
+};
+
+await fetch("/api/teachers",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(obj)
+});
+
+/* clear inputs */
+
+document.getElementById("name").value="";
+document.getElementById("subject").value="";
+
+load();
+
+}
+
+/* Delete teacher */
+
+async function deleteTeacher(id){
+
+if(confirm("Delete this teacher?")){
+
+await fetch("/api/teachers/" + id,{
+method:"DELETE"
+});
+
+load();
+
+}
+
+}
+
+
+
+load();
+
+</script>
+
+</body>
+
+</html>

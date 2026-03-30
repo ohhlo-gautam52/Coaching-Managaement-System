@@ -1,0 +1,283 @@
+/* 
+
+body{
+font-family:"Segoe UI",sans-serif;
+background:linear-gradient(135deg,#eef2f7,#dce6f7);
+margin:0;
+padding:15px;
+overflow-x:hidden;
+}
+
+h2{
+text-align:center;
+margin-bottom:10px;
+font-size:22px;
+}
+/* toggle theme*/
+/* DARK MODE FULL THEME */
+
+.dark{
+background:#0f172a; /* deep navy */
+color:#e2e8f0;
+}
+
+/* CARDS */
+
+.dark .card,
+.dark .kpiCard,
+.dark #modulePanel{
+background:linear-gradient(135deg,#1e293b,#0f172a);
+color:#e2e8f0;
+}
+
+/* NAVBAR BUTTONS */
+
+.dark .navbar a{
+background:linear-gradient(135deg,#4f46e5,#7c3aed);
+}
+
+.dark .navbar a:hover{
+background:linear-gradient(135deg,#f59e0b,#ef4444);
+}
+
+/* TABLE */
+
+.dark table td{
+background:#1e293b;
+color:#e2e8f0;
+}
+
+.dark th{
+background:#4f46e5;
+}
+
+/* WORKFLOW BUTTONS */
+
+.dark .workflowItem{
+background:#1e293b;
+color:#cbd5f5;
+}
+
+.dark .workflowItem:hover{
+background:linear-gradient(135deg,#6366f1,#8b5cf6);
+color:white;
+}
+
+/* PREMIUM TOGGLE BUTTON */
+
+.toggleBtn{
+position:fixed;
+top:15px;
+right:20px;   /* ✅ moved right */
+
+padding:12px 20px;
+border:none;
+border-radius:30px;
+
+background:linear-gradient(135deg,#667eea,#764ba2);
+color:white;
+font-size:14px;
+font-weight:600;
+
+cursor:pointer;
+
+box-shadow:0 6px 20px rgba(0,0,0,0.3);
+transition:0.3s;
+z-index:999;  /* ✅ stays above */
+}
+
+/* hover */
+.toggleBtn:hover{
+transform:scale(1.08);
+background:linear-gradient(135deg,#ff7e5f,#feb47b);
+}
+/* HOVER */
+
+.toggleBtn:hover{
+transform:scale(1.08);
+background:linear-gradient(135deg,#ff7e5f,#feb47b);
+}
+
+/* DARK ACTIVE STATE */
+
+.dark .toggleBtn{
+background:linear-gradient(135deg,#f59e0b,#ef4444);
+}
+/* CHART CARD */
+
+.dark .chartContainer{
+background:transparent;
+}
+/* NAVBAR */
+
+.navbar{
+display:grid;
+grid-template-columns:repeat(8,1fr);  /* 8 per row */
+gap:12px;
+
+max-width:1400px;
+margin:60px auto 20px;  /* ✅ push below toggle */
+}
+
+.navbar a{
+display:flex;
+align-items:center;
+justify-content:center;
+
+padding:14px 0;   /* bigger */
+border-radius:25px;
+
+font-size:14px;
+font-weight:600;
+
+text-decoration:none;
+color:white;
+
+background:linear-gradient(135deg,#667eea,#764ba2);
+
+transition:0.3s;
+box-shadow:0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* hover */
+.navbar a:hover{
+transform:translateY(-4px) scale(1.05);
+background:linear-gradient(135deg,#ff7e5f,#feb47b);
+}
+
+/*kpi card*/
+.kpi{
+display:grid !important;
+grid-template-columns:repeat(4,1fr) !important;
+gap:12px;
+max-width:1400px;
+margin:10px auto 15px;
+}
+
+.kpiCard{
+background:linear-gradient(135deg,#a8b7e3,#252129);
+color:white;
+padding:15px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+transition:0.3s;
+}
+
+.kpiCard:hover{
+transform:translateY(-5px);
+}
+
+.kpiCard p{
+font-size:20px;
+font-weight:bold;
+margin-top:5px;
+}
+
+/* GRID */
+
+.dashboard{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:15px;
+max-width:1400px;
+margin:auto;
+}
+
+/* CARD */
+
+.card{
+background:white;
+border-radius:10px;
+padding:15px;
+box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+.card h3{
+text-align:center;
+font-size:15px;
+margin-bottom:8px;
+}
+
+/* CHART */
+
+.chartContainer{
+height:220px;
+}
+
+/* WORKFLOW */
+
+.workflow{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:6px;
+}
+
+.workflowItem{
+padding:8px;
+border-radius:6px;
+background:#f2f4fa;
+text-align:center;
+font-size:12px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.workflowItem:hover{
+background:#667eea;
+color:white;
+transform:scale(1.03);
+}
+
+/* PANEL */
+
+#modulePanel{
+margin-top:20px;
+background:white;
+padding:15px;
+border-radius:10px;
+display:none;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* FORM */
+
+input{
+padding:6px;
+margin:5px;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+button{
+padding:6px 10px;
+background:#667eea;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff7e5f;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+margin-top:10px;
+border-collapse:collapse;
+}
+
+td,th{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#667eea;
+color:white;
+}
+ 

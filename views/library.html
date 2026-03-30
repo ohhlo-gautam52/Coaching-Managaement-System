@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Library Management</title>
+
+<style>
+body{font-family:Arial;margin:30px;background:#f5f7fb}
+.container{background:white;padding:20px;border-radius:10px;margin-bottom:20px}
+input,select{padding:10px;margin:5px;border-radius:6px;border:1px solid #ccc}
+button{padding:10px;background:#2563eb;color:white;border:none;border-radius:6px;cursor:pointer}
+table{width:100%;border-collapse:collapse;background:white}
+th{background:#2563eb;color:white;padding:10px}
+td{padding:10px;border:1px solid #ddd;text-align:center}
+</style>
+
+</head>
+<link rel="stylesheet" href="/css/style.css">
+<body>
+
+<h2>Library Management</h2>
+
+<!-- ADD BOOK -->
+
+<div class="container">
+<h3>Add Book</h3>
+<input id="title" placeholder="Title">
+<input id="author" placeholder="Author">
+<input id="isbn" placeholder="ISBN">
+<input id="publisher" placeholder="Publisher">
+<input id="category" placeholder="Category">
+<input id="rack" placeholder="Rack">
+<input id="qty" placeholder="Quantity">
+<button onclick="addBook()">Add</button>
+</div>
+
+<!-- SEARCH -->
+
+<div class="container">
+<input id="search" placeholder="Search by title/author/category">
+<button onclick="load()">Search</button>
+</div>
+
+<!-- MEMBER -->
+
+<div class="container">
+<h3>Register Member</h3>
+<input id="memberName" placeholder="Name">
+<input id="memberType" placeholder="Student/Staff">
+<button onclick="addMember()">Register</button>
+</div>
+
+<!-- ISSUE -->
+
+<div class="container">
+<h3>Issue Book</h3>
+<input id="issueBook" placeholder="Book Title">
+<input id="issueMember" placeholder="Member Name">
+<input type="date" id="dueDate">
+<button onclick="issue()">Issue</button>
+</div>
+
+<!-- RETURN -->
+
+<div class="container">
+<h3>Return Book</h3>
+<input id="returnBook" placeholder="Book Title">
+<button onclick="returnBookFn()">Return</button>
+</div>
+
+<!-- TABLE -->
+
+<table>
+<thead>
+<tr>
+<th>Title</th>
+<th>Author</th>
+<th>Category</th>
+<th>Rack</th>
+<th>Qty</th>
+<th>Issued To</th>
+<th>Due Date</th>
+<th>Fine</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+let members=[];
+
+/* LOAD */
+async function load(){
+
+const r = await fetch("/api/libraryBooks");
+let data = await r.json();
+
+const s = search.value.toLowerCase();
+
+data = data.filter(x=>{
+return (!s || 
+(x.title||"").toLowerCase().includes(s) ||
+(x.author||"").toLowerCase().includes(s) ||
+(x.category||"").toLowerCase().includes(s));
+});
+
+let html="";
+
+data.forEach(b=>{
+
+let fine = 0;
+
+if(b.dueDate){
+let today = new Date();
+let due = new Date(b.dueDate);
+
+if(today > due){
+fine = Math.floor((today-due)/(1000*60*60*24))*5;
+}
+}
+
+html+=`
+<tr>
+<td>${b.title}</td>
+<td>${b.author}</td>
+<td>${b.category || "-"}</td>
+<td>${b.rack || "-"}</td>
+<td>${b.qty || "-"}</td>
+<td>${b.issuedTo || "-"}</td>
+<td>${b.dueDate || "-"}</td>
+<td>${fine}</td>
+
+<td>
+<button onclick="del(${b.id})">Delete</button>
+</td>
+</tr>
+`;
+});
+
+tbody.innerHTML=html;
+}
+
+/* ADD BOOK */
+async function addBook(){
+
+await fetch("/api/libraryBooks",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+title:title.value,
+author:author.value,
+isbn:isbn.value,
+publisher:publisher.value,
+category:category.value,
+rack:rack.value,
+qty:qty.value,
+issuedTo:"",
+dueDate:""
+})
+});
+
+title.value=author.value=isbn.value=publisher.value=category.value=rack.value=qty.value="";
+
+load();
+}
+
+/* MEMBER */
+function addMember(){
+
+members.push({
+id:Date.now(),
+name:memberName.value,
+type:memberType.value
+});
+
+alert("Member Registered (ID: "+Date.now()+")");
+
+memberName.value=memberType.value="";
+}
+
+/* ISSUE */
+async function issue(){
+
+const r = await fetch("/api/libraryBooks");
+let data = await r.json();
+
+let book = data.find(x=>x.title===issueBook.value);
+
+if(!book){
+alert("Book not found"); return;
+}
+
+/* DELETE OLD */
+await fetch("/api/libraryBooks/"+book.id,{method:"DELETE"});
+
+/* UPDATE */
+book.issuedTo = issueMember.value;
+book.dueDate = dueDate.value;
+
+/* SAVE */
+await fetch("/api/libraryBooks",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(book)
+});
+
+alert("Book Issued");
+
+load();
+}
+
+/* RETURN */
+async function returnBookFn(){
+
+const r = await fetch("/api/libraryBooks");
+let data = await r.json();
+
+let book = data.find(x=>x.title===returnBook.value);
+
+if(!book){
+alert("Book not found"); return;
+}
+
+await fetch("/api/libraryBooks/"+book.id,{method:"DELETE"});
+
+book.issuedTo="";
+book.dueDate="";
+
+await fetch("/api/libraryBooks",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(book)
+});
+
+alert("Returned");
+
+load();
+}
+
+/* DELETE */
+async function del(id){
+
+if(confirm("Delete book?")){
+await fetch("/api/libraryBooks/"+id,{method:"DELETE"});
+load();
+}
+
+}
+
+/* INIT */
+load();
+
+</script>
+
+</body>
+</html>

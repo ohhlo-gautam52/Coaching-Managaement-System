@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Leave Management</title>
+
+<style>
+body{font-family:Arial;margin:30px;background:#f5f7fb}
+.container{background:white;padding:20px;border-radius:10px;margin-bottom:20px}
+input,select{padding:10px;margin:5px;border-radius:6px;border:1px solid #ccc}
+button{padding:8px 12px;background:#2563eb;color:white;border:none;border-radius:6px;cursor:pointer}
+table{width:100%;border-collapse:collapse;background:white}
+th{background:#2563eb;color:white;padding:10px}
+td{padding:10px;border:1px solid #ddd;text-align:center}
+.pending{color:orange;font-weight:bold}
+.approved{color:green;font-weight:bold}
+.rejected{color:red;font-weight:bold}
+</style>
+
+</head>
+<link rel="stylesheet" href="/css/style.css">
+<body>
+
+<h2>Leave Management</h2>
+
+<!-- APPLY -->
+
+<div class="container">
+<input id="name" placeholder="Employee Name">
+<input id="type" placeholder="Leave Type (Casual/Sick)">
+<input type="date" id="fromDate">
+<input type="date" id="toDate">
+<input id="reason" placeholder="Reason">
+<button onclick="add()">Apply Leave</button>
+</div>
+
+<!-- FILTER -->
+
+<div class="container">
+<input id="fName" placeholder="Filter Name">
+<select id="fStatus">
+<option value="">All</option>
+<option value="Pending">Pending</option>
+<option value="Approved">Approved</option>
+<option value="Rejected">Rejected</option>
+</select>
+<button onclick="load()">Apply Filter</button>
+</div>
+
+<!-- TABLE -->
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>From</th>
+<th>To</th>
+<th>Reason</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<script>
+
+/* LOAD */
+async function load(){
+
+const r = await fetch("/api/leaveRequests");
+let data = await r.json();
+
+/* GET FILTER VALUES */
+const nameFilter = document.getElementById("fName").value.toLowerCase();
+const statusFilter = document.getElementById("fStatus").value;
+
+/* APPLY FILTER (FIXED) */
+data = data.filter(x => {
+
+const nameMatch = !nameFilter || (x.name || "").toLowerCase().includes(nameFilter);
+const statusMatch = !statusFilter || (x.status || "Pending") === statusFilter;
+
+return nameMatch && statusMatch;
+
+});
+
+/* BUILD TABLE */
+let html="";
+
+data.forEach(x=>{
+
+html+=`
+
+<tr>
+<td>${x.name}</td>
+<td>${x.type || "-"}</td>
+<td>${x.fromDate || "-"}</td>
+<td>${x.toDate || "-"}</td>
+<td>${x.reason}</td>
+
+<td class="${(x.status||"Pending").toLowerCase()}">
+${x.status || "Pending"}
+</td>
+
+<td>
+
+${(!x.status || x.status==="Pending") ? `<button onclick="approve(${x.id})">Approve</button> <button onclick="reject(${x.id})">Reject</button>` : ""}
+
+<button onclick="del(${x.id})">Delete</button>
+
+</td>
+</tr>
+`;
+
+});
+
+document.getElementById("tbody").innerHTML = html;
+}
+
+/* ADD */
+async function add(){
+
+const n = document.getElementById("name").value.trim();
+const t = document.getElementById("type").value.trim();
+const f = document.getElementById("fromDate").value;
+const to = document.getElementById("toDate").value;
+const r = document.getElementById("reason").value.trim();
+
+if(!n || !r){
+alert("Fill required fields");
+return;
+}
+
+/* SAVE */
+await fetch("/api/leaveRequests",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:n,
+type:t,
+fromDate:f,
+toDate:to,
+reason:r,
+status:"Pending"
+})
+});
+
+/* CLEAR */
+document.getElementById("name").value="";
+document.getElementById("type").value="";
+document.getElementById("fromDate").value="";
+document.getElementById("toDate").value="";
+document.getElementById("reason").value="";
+
+/* IMPORTANT FIX */
+await load();   
+
+alert("Leave Applied");
+}
+
+/* APPROVE */
+async function approve(id){
+
+const r = await fetch("/api/leaveRequests");
+let data = await r.json();
+
+let item = data.find(x=>x.id===id);
+
+await fetch("/api/leaveRequests/"+id,{method:"DELETE"});
+
+item.status="Approved";
+
+await fetch("/api/leaveRequests",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(item)
+});
+
+load();
+}
+
+/* REJECT */
+async function reject(id){
+
+const r = await fetch("/api/leaveRequests");
+let data = await r.json();
+
+let item = data.find(x=>x.id===id);
+
+await fetch("/api/leaveRequests/"+id,{method:"DELETE"});
+
+item.status="Rejected";
+
+await fetch("/api/leaveRequests",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(item)
+});
+
+load();
+}
+
+/* DELETE */
+async function del(id){
+
+if(confirm("Delete?")){
+await fetch("/api/leaveRequests/"+id,{method:"DELETE"});
+load();
+}
+
+}
+
+/* INIT */
+load();
+
+</script>
+
+
+</body>
+</html>

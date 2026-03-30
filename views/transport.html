@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Transport Management</title>
+
+<style>
+body{font-family:Arial;margin:30px;background:#f5f7fb}
+
+.container{
+background:white;padding:20px;border-radius:10px;margin-bottom:20px;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+input{
+padding:10px;margin:5px;border-radius:6px;border:1px solid #ccc;
+}
+
+button{
+padding:10px 15px;background:#2563eb;color:white;border:none;border-radius:6px;cursor:pointer;
+}
+
+table{
+width:100%;border-collapse:collapse;background:white;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+th{background:#2563eb;color:white;padding:10px}
+td{padding:10px;border:1px solid #ddd;text-align:center}
+</style>
+
+</head>
+<link rel="stylesheet" href="/css/style.css">
+<body>
+
+<h2>Transport Management</h2>
+
+<!-- ROUTE -->
+
+<div class="container">
+<h3>Route Management</h3>
+<input id="route" placeholder="Route Name">
+<input id="stops" placeholder="Stops (A,B,C)">
+<input id="distance" placeholder="Distance (km)">
+<input id="time" placeholder="Timing (8:00 AM)">
+<button onclick="addRoute()">Add Route</button>
+</div>
+
+<!-- VEHICLE -->
+
+<div class="container">
+<h3>Vehicle Register</h3>
+<input id="vehicleNo" placeholder="Vehicle Number">
+<input id="type" placeholder="Type (Bus/Van)">
+<input id="capacity" placeholder="Capacity">
+<input id="insurance" placeholder="Insurance Valid Till">
+<button onclick="addVehicle()">Add Vehicle</button>
+</div>
+
+<!-- ASSIGN -->
+
+<div class="container">
+<h3>Assign Vehicle & Driver</h3>
+<input id="assignRoute" placeholder="Route Name">
+<input id="assignVehicle" placeholder="Vehicle No">
+<input id="driver" placeholder="Driver Name">
+<button onclick="assign()">Assign</button>
+</div>
+
+<!-- STUDENT REPORT -->
+
+<div class="container">
+<h3>Student Transport</h3>
+<input id="student" placeholder="Student Name">
+<input id="studentRoute" placeholder="Route">
+<input id="studentVehicle" placeholder="Vehicle">
+<button onclick="addStudent()">Add</button>
+</div>
+
+<!-- TABLE -->
+
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Stops</th>
+<th>Distance</th>
+<th>Time</th>
+<th>Vehicle</th>
+<th>Driver</th>
+<th>Students</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+/* LOAD */
+async function load(){
+
+const r = await fetch("/api/transportRoutes");
+let data = await r.json();
+
+let html="";
+
+data.forEach(route=>{
+
+html+=`
+<tr>
+<td>${route.route}</td>
+<td>${route.stops || "-"}</td>
+<td>${route.distance || "-"}</td>
+<td>${route.time || "-"}</td>
+
+<td>${route.vehicle || "-"}</td>
+<td>${route.driver || "-"}</td>
+<td>${(route.students || []).join(", ") || "-"}</td>
+
+<td>
+<button onclick="del(${route.id})">Delete</button>
+</td>
+</tr>
+`;
+});
+
+tbody.innerHTML=html;
+}
+
+/* ADD ROUTE */
+async function addRoute(){
+
+await fetch("/api/transportRoutes",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+route:route.value,
+stops:stops.value,
+distance:distance.value,
+time:time.value,
+vehicle:"",
+driver:"",
+students:[]
+})
+});
+
+route.value=stops.value=distance.value=time.value="";
+
+load();
+}
+
+/* ASSIGN DRIVER and VEHICLE */
+async function assign(){
+
+const r = await fetch("/api/transportRoutes");
+let data = await r.json();
+
+let item = data.find(x=>x.route===assignRoute.value);
+
+if(!item){
+alert("Route not found");
+return;
+}
+
+/* DELETE OLD */
+await fetch("/api/transportRoutes/"+item.id,{method:"DELETE"});
+
+/* UPDATE */
+item.vehicle = assignVehicle.value;
+item.driver = driver.value;
+
+/* SAVE AGAIN */
+await fetch("/api/transportRoutes",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(item)
+});
+
+alert("Assigned");
+
+load();
+}
+
+/* ADD STUDENT */
+async function addStudent(){
+
+const r = await fetch("/api/transportRoutes");
+let data = await r.json();
+
+let item = data.find(x=>x.route===studentRoute.value);
+
+if(!item){
+alert("Route not found");
+return;
+}
+
+/* DELETE OLD */
+await fetch("/api/transportRoutes/"+item.id,{method:"DELETE"});
+
+/* ADD STUDENT */
+if(!item.students) item.students=[];
+
+item.students.push(student.value);
+
+/* SAVE AGAIN */
+await fetch("/api/transportRoutes",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(item)
+});
+
+alert("Student Added");
+
+load();
+}
+
+/* DELETE */
+async function del(id){
+
+if(confirm("Delete route?")){
+await fetch("/api/transportRoutes/"+id,{method:"DELETE"});
+load();
+}
+
+}
+
+/* INIT */
+load();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,249 @@
+<html>
+
+<head>
+<link rel="stylesheet" href="/css/style.css">
+
+<style>
+
+/* PAGE */
+body{
+padding:20px;
+}
+
+/* FORM */
+.formBox{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:15px;
+}
+
+input, select{
+padding:8px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+padding:8px 15px;
+border:none;
+border-radius:8px;
+background:#2563eb;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+/* TABLE */
+table{
+margin-top:10px;
+border-collapse:collapse;
+width:100%;
+}
+
+th{
+background:#2563eb;
+color:white;
+padding:10px;
+}
+
+td{
+padding:10px;
+text-align:center;
+border:1px solid #ddd;
+}
+
+/* SECTION */
+.section{
+margin-top:25px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>💰 Fees Management</h2>
+
+<!-- ================= ADD FEE ================= -->
+
+<div class="formBox">
+
+<input id="student" placeholder="Student Name">
+<input id="class" placeholder="Class">
+<input id="amount" placeholder="Amount">
+
+<select id="method">
+<option value="Cash">Cash</option>
+<option value="Online">Online</option>
+<option value="Bank">Bank</option>
+</select>
+
+<button onclick="add()">Collect Fee</button>
+
+</div>
+
+<!-- ================= SEARCH ================= -->
+
+<div class="section">
+
+<h3>🔍 Search Payments</h3>
+
+<input id="searchName" placeholder="Search by student name">
+<button onclick="search()">Search</button>
+
+</div>
+
+<!--  DUE  -->
+
+<div class="section">
+
+
+
+<!-- TABLE  -->
+
+<table id="table">
+
+<thead>
+<tr>
+<th>Student</th>
+<th>Class</th>
+<th>Amount</th>
+<th>Method</th>
+<th>Date</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+/* LOAD ALL FEES */
+
+async function load(){
+
+const r = await fetch("/api/fees");
+const d = await r.json();
+
+renderTable(d);
+
+}
+
+/* ADD FEE  */
+
+document.getElementById("class").value="";
+
+/* DELETE  */
+
+async function deleteFee(id){
+
+if(confirm("Delete this fee?")){
+
+await fetch("/api/fees/"+id,{method:"DELETE"});
+
+load();
+
+}
+
+}
+
+/*  SEARCH  */
+
+async function search(){
+
+const name = document.getElementById("searchName").value;
+
+const r = await fetch("/api/fees");
+const d = await r.json();
+
+const filtered = d.filter(x =>
+x.student.toLowerCase().includes(name.toLowerCase())
+);
+
+renderTable(filtered);
+
+}
+
+/* DUE */
+
+
+/* add */
+async function add(){
+
+const student = document.getElementById("student").value;
+const cls = document.getElementById("class").value;
+const amount = document.getElementById("amount").value;
+const method = document.getElementById("method").value;
+
+if(!student || !amount){
+alert("Fill all fields");
+return;
+}
+
+const obj = {
+student: student,
+class: cls,
+amount: Number(amount),
+method: method,
+date: new Date().toLocaleDateString()
+};
+
+await fetch("/api/fees",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify(obj)
+});
+
+/* CLEAR INPUTS */
+document.getElementById("student").value="";
+document.getElementById("class").value="";
+document.getElementById("amount").value="";
+
+load();
+}
+
+/*RENDER TABLE */
+
+function renderTable(data){
+
+const tbody = document.getElementById("tbody");
+
+tbody.innerHTML="";
+
+data.forEach(x=>{
+
+tbody.innerHTML+=`
+<tr>
+<td>${x.student || x.name}</td>
+<td>${x.class || "-"}</td>
+<td>₹${x.amount || x.due}</td>
+<td>${x.method || "-"}</td>
+<td>${x.date || "-"}</td>
+<td>
+<button onclick="deleteFee(${x.id})">Delete</button>
+</td>
+</tr>
+`;
+
+});
+
+}
+
+/* INIT */
+
+load();
+
+</script>
+
+</body>
+
+</html>

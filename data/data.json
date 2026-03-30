@@ -1,0 +1,495 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "username": "teacher",
+      "password": "teacher123",
+      "role": "teacher"
+    },
+    {
+      "id": 3,
+      "username": "student",
+      "password": "student123",
+      "role": "student"
+    }
+  ],
+  "students": [
+    {
+      "name": "Himani Zambare",
+      "class": "12",
+      "id": 1774192141831,
+      "status": "Active"
+    },
+    {
+      "name": "NoteForge Ai",
+      "class": "12",
+      "category": "ASD",
+      "guardian": "ASD",
+      "status": "Active",
+      "id": 1774192158851
+    },
+    {
+      "name": "priyanshu",
+      "class": "11",
+      "category": "qw",
+      "guardian": "q",
+      "status": "Active",
+      "id": 1774891866600
+    }
+  ],
+  "teachers": [
+    {
+      "name": "aro",
+      "subject": "physics",
+      "id": 1773852862844
+    },
+    {
+      "name": "asdf",
+      "subject": "sdf",
+      "id": 1774191965905
+    }
+  ],
+  "attendance": [
+    {
+      "student": "h",
+      "date": "23",
+      "id": 1773832931114
+    },
+    {
+      "student": "hkinan",
+      "date": "12-03-20",
+      "status": "Absent",
+      "id": 1773853634856
+    },
+    {
+      "student": "we",
+      "date": "23",
+      "status": "qw",
+      "id": 1774191971320
+    }
+  ],
+  "marks": [
+    {
+      "student": "himani",
+      "subject": "math",
+      "score": "12",
+      "id": 1773854995639
+    },
+    {
+      "student": "priyanshu",
+      "subject": "phy",
+      "score": "13",
+      "id": 1773855003357
+    },
+    {
+      "student": "himanshu",
+      "subject": "phy",
+      "score": "80",
+      "id": 1773855175513
+    },
+    {
+      "student": "simran",
+      "subject": "chem",
+      "score": "90",
+      "id": 1773855183894
+    },
+    {
+      "student": "suyash",
+      "subject": "bio",
+      "score": "70",
+      "id": 1773855195383
+    },
+    {
+      "student": "vaishnavi",
+      "subject": "chem",
+      "score": "50",
+      "id": 1773855208617
+    },
+    {
+      "student": "himANI",
+      "subject": "Physics",
+      "marks": 90,
+      "id": 1774184588410
+    },
+    {
+      "student": "himani",
+      "subject": "math",
+      "marks": 67,
+      "id": 1774184954760
+    },
+    {
+      "student": "himani",
+      "subject": "phy",
+      "marks": 23,
+      "id": 1774185103245
+    },
+    {
+      "student": "him",
+      "subject": "ghj",
+      "marks": 23,
+      "id": 1774185162888
+    },
+    {
+      "student": "hi",
+      "subject": "gh",
+      "marks": 78,
+      "id": 1774185372922
+    },
+    {
+      "student": "him",
+      "subject": "phy",
+      "marks": 45,
+      "id": 1774185631228
+    },
+    {
+      "student": "qwe",
+      "subject": "aqwe",
+      "score": "23",
+      "id": 1774191976430
+    }
+  ],
+  "fees": [
+    {
+      "student": "h",
+      "class": "12",
+      "amount": 12000,
+      "method": "Cash",
+      "date": "3/22/2026",
+      "id": 1774183241215
+    },
+    {
+      "student": "him",
+      "class": "12",
+      "amount": 12000,
+      "method": "Cash",
+      "date": "3/22/2026",
+      "id": 1774183778182
+    },
+    {
+      "student": "him",
+      "class": "12",
+      "amount": 12000,
+      "method": "Cash",
+      "date": "3/22/2026",
+      "id": 1774183791174
+    },
+    {
+      "student": "himani",
+      "class": "12",
+      "amount": 12000,
+      "method": "Cash",
+      "date": "3/22/2026",
+      "id": 1774184185471
+    },
+    {
+      "student": "qw",
+      "class": "22",
+      "amount": 12000,
+      "method": "Cash",
+      "date": "3/22/2026",
+      "id": 1774191983225
+    }
+  ],
+  "materials": [
+    {
+      "id": 1774188424627,
+      "title": "as",
+      "subject": "sd",
+      "file": "1774188424624.docx"
+    },
+    {
+      "id": 1774192008763,
+      "title": "as",
+      "subject": "phy",
+      "file": "1774192008762.docx"
+    }
+  ],
+  "chat": [
+    {
+      "user": "sd",
+      "text": "wef",
+      "id": 1773832994827
+    },
+    {
+      "id": 1773834601310,
+      "user": "himani",
+      "text": "hi"
+    },
+    {
+      "id": 1774189935766,
+      "user": "himani",
+      "text": "asdfgASD [File: offcampus.job.pdf]"
+    },
+    {
+      "id": 1774190097363,
+      "user": "himani",
+      "text": "hi [File: offcampus.job.pdf]"
+    },
+    {
+      "id": 1774190127602,
+      "user": "himani",
+      "text": "hi"
+    },
+    {
+      "id": 1774190210834,
+      "user": "himani",
+      "text": "hi"
+    },
+    {
+      "id": 1774190231771,
+      "user": "himani",
+      "text": "df"
+    },
+    {
+      "id": 1774190349415,
+      "user": "Himani",
+      "text": "Zvbcv"
+    },
+    {
+      "id": 1774190539974,
+      "user": "himani",
+      "text": "asdfgsdf"
+    },
+    {
+      "id": 1774190545711,
+      "user": "himania",
+      "text": "as"
+    },
+    {
+      "id": 1774190868128,
+      "user": "as",
+      "text": "as"
+    },
+    {
+      "id": 1774190907018,
+      "user": "Himani",
+      "text": "asd"
+    },
+    {
+      "id": 1774190910853,
+      "user": "Himani",
+      "text": "asd"
+    },
+    {
+      "id": 1774190962687,
+      "user": "sdf",
+      "text": "asd"
+    },
+    {
+      "id": 1774191014150,
+      "user": "as",
+      "text": "as"
+    },
+    {
+      "id": 1774191060414,
+      "user": "Himani",
+      "text": "asd"
+    },
+    {
+      "id": 1774191068045,
+      "user": "Himaniasd",
+      "text": "asd"
+    },
+    {
+      "id": 1774191087552,
+      "user": "Himaniasd",
+      "text": "h"
+    },
+    {
+      "id": 1774191095097,
+      "user": "priyanshu",
+      "text": "a"
+    }
+  ],
+  "timetable": [
+    {
+      "class": "12",
+      "subject": "math",
+      "time": "12",
+      "id": 1774191995193
+    }
+  ],
+  "admission": [
+    {
+      "name": "Himani Zambare",
+      "course": "physics",
+      "id": 1773999252746
+    },
+    {
+      "name": "dfgh",
+      "course": "fgh",
+      "id": 1774004782215
+    }
+  ],
+  "visitors": [],
+  "calls": [
+    {
+      "name": "we",
+      "phone": "8956193620",
+      "id": 1773999272682
+    }
+  ],
+  "incomingMail": [
+    {
+      "name": "himani",
+      "details": "1234567",
+      "id": 1773999724689
+    }
+  ],
+  "outgoingMail": [
+    {
+      "name": "priyanshu",
+      "details": "123",
+      "id": 1773999732737
+    }
+  ],
+  "complaints": [
+    {
+      "name": "Himani Zambare",
+      "details": "sd",
+      "id": 1774002629092
+    }
+  ],
+  "exams": [
+    {
+      "subject": "phy",
+      "date": "12",
+      "id": 1773991839938
+    },
+    {
+      "subject": "math",
+      "date": "2026-03-10",
+      "type": "MID",
+      "id": 1774184564545
+    },
+    {
+      "subject": "phy",
+      "date": "2026-03-04",
+      "type": "mi",
+      "id": 1774184649728
+    },
+    {
+      "subject": "math",
+      "date": "2026-03-04",
+      "type": "mid",
+      "id": 1774184934744
+    },
+    {
+      "subject": "math",
+      "date": "2026-03-11",
+      "type": "mid",
+      "id": 1774185089095
+    },
+    {
+      "subject": "phy",
+      "date": "2026-03-04",
+      "type": "mis",
+      "id": 1774185148533
+    },
+    {
+      "subject": "phy",
+      "date": "2026-03-05",
+      "type": "mid",
+      "id": 1774185361543
+    },
+    {
+      "subject": "d",
+      "date": "2026-03-05",
+      "type": "mid",
+      "id": 1774185618060
+    }
+  ],
+  "onlineExams": [
+    {
+      "name": "maths",
+      "duration": "30",
+      "questions": [],
+      "id": 1774188591979
+    }
+  ],
+  "homework": [
+    {
+      "className": "12",
+      "section": "A",
+      "subject": "phy",
+      "task": "asdfd",
+      "dueDate": "2026-03-09",
+      "status": "Submitted",
+      "id": 1774188995559,
+      "pdf": "hw-1774188995559.pdf"
+    }
+  ],
+  "employees": [
+    {
+      "name": "Himani Zambare",
+      "role": "112",
+      "id": 1774000097560
+    }
+  ],
+  "leaveRequests": [
+    {
+      "name": "Himani Zambare",
+      "type": "sd",
+      "fromDate": "2026-03-04",
+      "toDate": "2026-03-10",
+      "reason": "asd",
+      "status": "Approved",
+      "id": 1774189738978
+    },
+    {
+      "name": "priyanshu",
+      "type": "planned",
+      "fromDate": "2026-03-12",
+      "toDate": "2026-03-11",
+      "reason": "asd",
+      "status": "Rejected",
+      "id": 1774189763165
+    }
+  ],
+  "libraryBooks": [
+    {
+      "title": "bible",
+      "author": "asdf",
+      "isbn": "23",
+      "publisher": "asd",
+      "category": "comic",
+      "rack": "1",
+      "qty": "1",
+      "issuedTo": "",
+      "dueDate": "",
+      "id": 1774191654103
+    }
+  ],
+  "transportRoutes": [
+    {
+      "route": "malad",
+      "stops": "a",
+      "distance": "23",
+      "time": "9:00",
+      "vehicle": "1234sw456",
+      "driver": "sd",
+      "students": [
+        "him"
+      ],
+      "id": 1774191459072
+    }
+  ],
+  "hostelRooms": [
+    {
+      "room": "12",
+      "student": "him",
+      "id": 1773991895935
+    }
+  ],
+  "student": "...",
+  "class": "...",
+  "amount": "...",
+  "method": "...",
+  "date": "..."
+}

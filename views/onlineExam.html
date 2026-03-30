@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Online Examination</title>
+
+<style>
+body{font-family:Arial;margin:30px;background:#f5f7fb}
+.container{background:white;padding:20px;border-radius:10px;margin-bottom:20px}
+input,select{padding:10px;margin:5px;border-radius:6px;border:1px solid #ccc}
+button{padding:10px 15px;background:#2563eb;color:white;border:none;border-radius:6px;cursor:pointer}
+table{width:100%;border-collapse:collapse;background:white}
+th{background:#2563eb;color:white;padding:10px}
+td{padding:10px;border:1px solid #ddd;text-align:center}
+</style>
+
+</head>
+<link rel="stylesheet" href="/css/style.css">
+<body>
+
+<h2>Online Examination</h2>
+
+<div class="container">
+<input id="examName" placeholder="Exam Name">
+<input id="duration" placeholder="Duration">
+<button onclick="createExam()">Create Exam</button>
+</div>
+
+<div class="container">
+<h3>Question Bank</h3>
+<input id="subject" placeholder="Subject">
+<input id="grade" placeholder="Grade/Class">
+<input id="topic" placeholder="Topic">
+<select id="qType">
+<option value="mcq">MCQ</option>
+<option value="tf">True/False</option>
+<option value="fill">Fill Blank</option>
+</select>
+<input id="question" placeholder="Question">
+<input id="opt1" placeholder="Option 1">
+<input id="opt2" placeholder="Option 2">
+<input id="opt3" placeholder="Option 3">
+<input id="opt4" placeholder="Option 4">
+<input id="answer" placeholder="Answer">
+<button onclick="addQuestion()">Add Question</button>
+</div>
+
+<div class="container">
+<h3>Filter Questions</h3>
+<input id="fSubject" placeholder="Subject">
+<input id="fGrade" placeholder="Grade">
+<input id="fTopic" placeholder="Topic">
+<button onclick="filterQuestions()">Apply Filter</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Exam</th>
+<th>Duration</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<div id="examSection" class="container" style="display:none">
+<h3 id="title"></h3>
+<div id="questions"></div>
+<button onclick="submitExam()">Submit</button>
+</div>
+
+<script>
+
+let exams=[];
+let questionBank=[];
+let filteredQuestions=[];
+let currentExam=null;
+
+async function load(){
+const r = await fetch("/api/onlineExams");
+exams = await r.json();
+let html="";
+exams.forEach(e=>{
+html+=`<tr>
+<td>${e.name}</td>
+<td>${e.duration}</td>
+<td>
+<button onclick="start(${e.id})">Start</button>
+<button onclick="removeExam(${e.id})">Delete</button>
+</td>
+</tr>`;
+});
+tbody.innerHTML=html;
+}
+
+async function createExam(){
+if(!examName.value || !duration.value){alert("Fill all fields");return;}
+await fetch("/api/onlineExams",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:examName.value,duration:duration.value})});
+alert("Saved");
+examName.value="";duration.value="";
+load();
+}
+
+function addQuestion(){
+if(!question.value || !answer.value || !subject.value || !grade.value || !topic.value){alert("Fill all fields");return;}
+questionBank.push({subject:subject.value,grade:grade.value,topic:topic.value,type:qType.value,question:question.value,options:[opt1.value,opt2.value,opt3.value,opt4.value],answer:answer.value});
+alert("Question Added");
+subject.value=grade.value=topic.value="";
+question.value=opt1.value=opt2.value=opt3.value=opt4.value=answer.value="";
+}
+
+function filterQuestions(){
+filteredQuestions = questionBank.filter(q=>{
+return ((!fSubject.value || q.subject===fSubject.value) &&(!fGrade.value || q.grade===fGrade.value) &&(!fTopic.value || q.topic===fTopic.value));
+});
+alert(filteredQuestions.length+" questions found");
+}
+
+function start(id){
+currentExam = exams.find(x=>x.id===id);
+let qs = filteredQuestions.length ? filteredQuestions : questionBank;
+examSection.style.display="block";
+title.innerText=currentExam.name;
+let html="";
+qs.forEach((q,i)=>{
+html+=`<p>${i+1}. ${q.question}</p>`;
+if(q.type==="mcq"){
+q.options.forEach(opt=>{if(opt){html+=`<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label><br>`;}});
+}
+else if(q.type==="tf"){
+html+=`<label><input type="radio" name="q${i}" value="true"> True</label>
+<label><input type="radio" name="q${i}" value="false"> False</label>`;
+}
+else{
+html+=`<input type="text" name="q${i}">`;
+}
+});
+questions.innerHTML=html;
+}
+
+function submitExam(){
+let score=0;
+let qs = filteredQuestions.length ? filteredQuestions : questionBank;
+qs.forEach((q,i)=>{
+let ans;
+if(q.type==="mcq"||q.type==="tf"){
+let selected=document.querySelector(`input[name="q${i}"]:checked`);
+ans = selected ? selected.value : "";
+}else{
+ans = document.querySelector(`input[name="q${i}"]`).value;
+}
+if(ans.toLowerCase()===q.answer.toLowerCase()){score++;}
+});
+alert("Your Score: "+score+" / "+qs.length);
+}
+
+async function removeExam(id){
+await fetch("/api/onlineExams/"+id,{method:"DELETE"});
+load();
+}
+
+load();
+
+</script>
+
+</body>
+</html>

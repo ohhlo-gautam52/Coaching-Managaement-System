@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Advanced Exam System</title>
+
+<style>
+body{font-family:sans-serif;margin:20px}
+input,select{padding:8px;margin:5px;border-radius:6px;border:1px solid #ccc;}
+button{padding:8px 12px;background:#2563eb;color:white;border:none;border-radius:6px;cursor:pointer;}
+.section{margin-top:25px}
+table{width:100%;margin-top:10px;border-collapse:collapse}
+th{background:#2563eb;color:white;padding:8px}
+td{padding:8px;border:1px solid #ddd;text-align:center}
+.gradeBadge{padding:5px 10px;border-radius:20px;color:white}
+.A{background:#22c55e}.B{background:#3b82f6}.C{background:#facc15;color:black}.D{background:#f97316}.F{background:#ef4444}
+</style>
+
+</head>
+<link rel="stylesheet" href="/css/style.css">
+<body>
+
+<h2> Advanced Examination Management</h2>
+
+<!-- EXAM TYPE -->
+
+<div class="section">
+<h3> Exam Type</h3>
+<input id="etype" placeholder="Unit / Mid / Final">
+<input id="weight" placeholder="Weightage %">
+<button onclick="addExamType()">Add</button>
+</div>
+
+<!-- GRADE -->
+
+<div class="section">
+<h3>Grade System</h3>
+<input id="gname" placeholder="Grade">
+<input id="gmin" placeholder="Min">
+<input id="gmax" placeholder="Max">
+<input id="gpoint" placeholder="Point">
+<button onclick="addGrade()">Add</button>
+</div>
+
+<!-- SCHEDULE -->
+
+<div class="section">
+<h3> Exam Schedule</h3>
+<input id="sub" placeholder="Subject">
+<input id="edate" type="date">
+<input id="etime" type="time">
+<input id="room" placeholder="Room">
+<select id="etypeSel"></select>
+<button onclick="addExam()">Add</button>
+</div>
+
+<!-- SETUP -->
+
+<div class="section">
+<h3> Exam Setup</h3>
+<input id="className" placeholder="Class">
+<input id="sectionName" placeholder="Section">
+<input id="pass" placeholder="Pass Marks">
+<input id="full" placeholder="Full Marks">
+<button onclick="addSetup()">Save</button>
+</div>
+
+<!-- MARKS -->
+
+<div class="section">
+<h3> Marks Entry</h3>
+<input id="student" placeholder="Student">
+<input id="subject" placeholder="Subject">
+<input id="marks" placeholder="Marks">
+<select id="examTypeM"></select>
+<button onclick="addMarks()">Save</button>
+</div>
+
+<!-- ATTENDANCE -->
+
+<div class="section">
+<h3> Attendance</h3>
+<input id="studentA" placeholder="Student">
+<select id="status">
+<option>Present</option>
+<option>Absent</option>
+</select>
+<button onclick="addAttendance()">Save</button>
+</div>
+
+<!-- RESULT -->
+
+<div class="section">
+<h3> Result</h3>
+<button onclick="generateResult()">Generate Result</button>
+<button onclick="printResult()">Print</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Student</th>
+<th>Total</th>
+<th>Grade</th>
+<th>CGPA</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<script>
+
+let examTypes=[], grades=[], marksData=[], attendance=[], schedules=[], setups=[];
+
+/* DEFAULT */
+grades=[
+{grade:"A",min:80,max:100,point:10},
+{grade:"B",min:60,max:79,point:8},
+{grade:"C",min:40,max:59,point:6},
+{grade:"D",min:33,max:39,point:4},
+{grade:"F",min:0,max:32,point:0}
+];
+
+examTypes=[
+{name:"unit",weight:30},
+{name:"mid",weight:30},
+{name:"final",weight:40}
+];
+
+updateDropdowns();
+
+/* EXAM TYPE */
+function addExamType(){
+if(!etype.value || !weight.value) return alert("Fill all fields");
+examTypes.push({name:etype.value,weight:Number(weight.value)});
+alert("Exam Type Saved");
+etype.value=""; weight.value="";
+updateDropdowns();
+}
+
+/* GRADE */
+function addGrade(){
+if(!gname.value || !gmin.value || !gmax.value || !gpoint.value) return alert("Fill all fields");
+grades.push({grade:gname.value,min:Number(gmin.value),max:Number(gmax.value),point:Number(gpoint.value)});
+alert("Grade Saved");
+gname.value=gmin.value=gmax.value=gpoint.value="";
+}
+
+/* SCHEDULE */
+function addExam(){
+if(!sub.value || !edate.value || !etime.value || !room.value) return alert("Fill all fields");
+schedules.push({subject:sub.value,date:edate.value,time:etime.value,room:room.value,type:etypeSel.value});
+alert("Schedule Saved");
+sub.value=edate.value=etime.value=room.value="";
+}
+
+/* SETUP */
+function addSetup(){
+if(!className.value || !sectionName.value || !pass.value || !full.value) return alert("Fill all fields");
+setups.push({class:className.value,section:sectionName.value,pass:pass.value,full:full.value});
+alert("Setup Saved");
+className.value=sectionName.value=pass.value=full.value="";
+}
+
+/* MARKS */
+function addMarks(){
+if(!student.value || !subject.value || !marks.value) return alert("Fill all fields");
+marksData.push({student:student.value,subject:subject.value,marks:Number(marks.value),type:examTypeM.value});
+alert("Marks Saved");
+student.value=subject.value=marks.value="";
+}
+
+/* ATTENDANCE */
+function addAttendance(){
+if(!studentA.value) return alert("Enter name");
+attendance.push({student:studentA.value,status:status.value});
+alert("Attendance Saved");
+studentA.value="";
+}
+
+/* RESULT */
+function generateResult(){
+
+if(marksData.length===0) return alert("No marks data");
+
+let result={};
+
+marksData.forEach(m=>{
+if(!result[m.student]) result[m.student]={total:0};
+let weight=examTypes.find(e=>e.name==m.type)?.weight || 100;
+result[m.student].total += (m.marks*weight)/100;
+});
+
+let html="";
+
+for(let s in result){
+
+let total=result[s].total.toFixed(2);
+
+let g=grades.find(x=>total>=x.min && total<=x.max);
+let grade=g?g.grade:"-";
+let cgpa=g?g.point:0;
+
+html+=`
+<tr>
+<td>${s}</td>
+<td>${total}</td>
+<td><span class="gradeBadge ${grade}">${grade}</span></td>
+<td>${cgpa}</td>
+<td>This is your grade: ${grade}</td>
+</tr>`;
+}
+
+tbody.innerHTML=html;
+
+alert("Result Generated");
+}
+
+/* DROPDOWN */
+function updateDropdowns(){
+etypeSel.innerHTML=""; examTypeM.innerHTML="";
+examTypes.forEach(e=>{
+etypeSel.innerHTML+=`<option>${e.name}</option>`;
+examTypeM.innerHTML+=`<option>${e.name}</option>`;
+});
+}
+
+/* PRINT */
+function printResult(){
+window.print();
+}
+
+</script>
+
+</body>
+</html>

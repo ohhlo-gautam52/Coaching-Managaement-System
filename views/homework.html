@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Homework Management</title>
+
+<style>
+body{font-family:Arial;margin:30px;background:#f5f7fb}
+
+.container{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+input,select{
+padding:10px;
+margin:5px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+button{
+padding:10px 15px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+th{
+background:#2563eb;
+color:white;
+padding:10px;
+}
+
+td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
+}
+
+.pending{color:orange;font-weight:bold}
+.submitted{color:blue;font-weight:bold}
+.evaluated{color:green;font-weight:bold}
+
+a{
+color:#2563eb;
+text-decoration:none;
+font-weight:bold;
+}
+</style>
+
+</head>
+<link rel="stylesheet" href="/css/style.css">
+<body>
+
+<h2>Homework Management</h2>
+
+<!-- ADD HOMEWORK -->
+
+<div class="container">
+
+<input id="className" placeholder="Class">
+<input id="section" placeholder="Section">
+<input id="subject" placeholder="Subject">
+<input id="task" placeholder="Homework Description">
+<input id="dueDate" type="date">
+
+<button onclick="add()">Add Homework</button>
+
+</div>
+
+<!-- FILTER -->
+
+<div class="container">
+
+<input id="fClass" placeholder="Filter Class">
+<input id="fSubject" placeholder="Filter Subject">
+
+<select id="fStatus">
+<option value="">All Status</option>
+<option value="Pending">Pending</option>
+<option value="Submitted">Submitted</option>
+<option value="Evaluated">Evaluated</option>
+</select>
+
+<button onclick="load()">Apply Filter</button>
+
+</div>
+
+<!-- TABLE -->
+
+<table>
+
+<thead>
+<tr>
+<th>Class</th>
+<th>Section</th>
+<th>Subject</th>
+<th>Description</th>
+<th>Due Date</th>
+<th>Status</th>
+<th>Marks</th>
+<th>Remarks</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+/* LOAD */
+async function load(){
+
+const r = await fetch("/api/homework");
+let data = await r.json();
+
+/* FILTER */
+data = data.filter(x=>{
+return (
+(!fClass.value || x.className===fClass.value) &&
+(!fSubject.value || x.subject===fSubject.value) &&
+(!fStatus.value || x.status===fStatus.value)
+);
+});
+
+let html="";
+
+data.forEach(x=>{
+
+html+=`
+<tr>
+<td>${x.className}</td>
+<td>${x.section}</td>
+<td>${x.subject}</td>
+<td>${x.task}</td>
+<td>${x.dueDate}</td>
+
+<td class="${(x.status || "Pending").toLowerCase()}">
+${x.status || "Pending"}
+</td>
+
+<td>${x.marks || "-"}</td>
+<td>${x.remarks || "-"}</td>
+
+<td>
+
+<button onclick="markSubmitted(${x.id})">Submit</button>
+
+<button onclick="evaluate(${x.id})">Evaluate</button>
+
+<button onclick="generatePDF(${x.id})">Generate PDF</button>
+
+${x.pdf ? `<a href="/uploads/${x.pdf}" target="_blank">View PDF</a>` : ""}
+
+<button onclick="del(${x.id})">Delete</button>
+
+</td>
+</tr>
+`;
+});
+
+tbody.innerHTML=html;
+}
+
+/* ADD */
+async function add(){
+
+if(!className.value || !section.value || !subject.value || !task.value || !dueDate.value){
+alert("Fill all fields"); return;
+}
+
+await fetch("/api/homework",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+className:className.value,
+section:section.value,
+subject:subject.value,
+task:task.value,
+dueDate:dueDate.value,
+status:"Pending"
+})
+});
+
+alert("Homework Added");
+
+className.value=section.value=subject.value=task.value=dueDate.value="";
+
+load();
+}
+
+/* SUBMIT */
+async function markSubmitted(id){
+
+const r = await fetch("/api/homework");
+let data = await r.json();
+
+let hw = data.find(x=>x.id===id);
+
+hw.status="Submitted";
+
+await fetch("/api/homework",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(hw)
+});
+
+load();
+}
+
+/* EVALUATE */
+async function evaluate(id){
+
+let marks = prompt("Enter marks");
+let remarks = prompt("Enter remarks");
+
+if(marks===null) return;
+
+const r = await fetch("/api/homework");
+let data = await r.json();
+
+let hw = data.find(x=>x.id===id);
+
+hw.status="Evaluated";
+hw.marks=marks;
+hw.remarks=remarks;
+
+await fetch("/api/homework",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(hw)
+});
+
+load();
+}
+
+/* PDF */
+async function generatePDF(id){
+
+await fetch("/api/homework/pdf/"+id,{
+method:"POST"
+});
+
+alert("PDF Generated");
+
+load();
+}
+
+/* DELETE */
+async function del(id){
+
+if(confirm("Delete this homework?")){
+await fetch("/api/homework/"+id,{method:"DELETE"});
+load();
+}
+
+}
+
+/* INIT */
+load();
+
+</script>
+
+</body>
+</html>

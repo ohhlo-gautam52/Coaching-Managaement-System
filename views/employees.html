@@ -1,0 +1,68 @@
+<html>
+<head>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<h2>HR Management</h2>
+
+<input id="name" placeholder="Employee Name">
+<input id="role" placeholder="Role">
+<button onclick="add()">Add Employee</button>
+
+<table id="t">
+<tr>
+<th>Name</th>
+<th>Role</th>
+<th>Delete</th>
+</tr>
+</table>
+
+<script>
+
+async function load(){
+
+const r = await fetch("/api/employees");
+const d = await r.json();
+
+d.forEach(x=>{
+t.innerHTML += `
+<tr>
+<td>${x.name || x.employee || "—"}</td>
+<td>${x.role || "—"}</td>
+<td><button onclick="del(${x.id})">Delete</button></td>
+</tr>`;
+});
+
+}
+
+async function add(){
+
+
+
+await fetch("/api/employees",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("name").value,  
+role:document.getElementById("role").value
+})
+});
+
+location.reload();
+}
+
+async function del(id){
+
+await fetch("/api/employees/"+id,{method:"DELETE"});
+
+location.reload();
+}
+
+load();
+
+</script>
+
+</body>
+</html>
